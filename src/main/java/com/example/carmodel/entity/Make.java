@@ -1,4 +1,4 @@
-package entity;
+package com.example.carmodel.entity;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
