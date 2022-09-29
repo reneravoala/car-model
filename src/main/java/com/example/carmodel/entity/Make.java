@@ -19,9 +19,6 @@ public class Make {
     @Column(name = "name", length = 50, nullable = false, unique = true)
     private String name;
 
-    @Column(name = "logo", length = 50, nullable = false)
-    private String logo;
-
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
@@ -50,14 +47,6 @@ public class Make {
         this.name = name;
     }
 
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
-
     public Date getUpdatedAt() {
         return updatedAt;
     }
@@ -74,6 +63,18 @@ public class Make {
     public long countModels() {
         return models.size();
     }
+    @JsonSerialize
+    private String LogoUrl() {
+        return "http://127.0.0.1:8080/logo/"+getName().replace(" ", "_").toLowerCase();
+    }
 
-
+    //ito ts mety itany vue que misy le parametre request
+    @JsonSerialize
+    private String baseUrl(HttpServletRequest request) throws IOException {
+        String uri = ServletUriComponentsBuilder.fromRequestUri(request)
+                .replacePath(null)
+                .build()
+                .toUriString();
+        return uri;
+    }
 }
