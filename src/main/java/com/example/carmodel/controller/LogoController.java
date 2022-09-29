@@ -23,11 +23,11 @@ public class LogoController {
     @Autowired
     private MakeRepository makeRepository;
 
-    private InputStream getResourceAsStream(String resource) {
+    private InputStream getResourceAsStream() {
         final InputStream in
-                = getContextClassLoader().getResourceAsStream(resource);
+                = getContextClassLoader().getResourceAsStream("static/make-images/");
 
-        return in == null ? getClass().getResourceAsStream(resource) : in;
+        return in == null ? getClass().getResourceAsStream("static/make-images/") : in;
     }
 
     private ClassLoader getContextClassLoader() {
@@ -37,7 +37,7 @@ public class LogoController {
     @GetMapping("/logo")
     public List<String> getResourceLogo() throws IOException {
         List<String> filenames = new ArrayList<>();
-        try (InputStream in = getResourceAsStream("static/make-images/");
+        try (InputStream in = getResourceAsStream();
              BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
             String resource;
 
@@ -50,7 +50,7 @@ public class LogoController {
 
     @RequestMapping(value = "/logo/{marque}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     public void getLogo(HttpServletResponse response , @PathVariable String marque) throws IOException {
-        Make make = makeRepository.findByName(marque.replace('_', ' '));
+        Make make = makeRepository.findByNameIgnoreCase(marque.replace('_', ' '));
         ClassPathResource imgFile = new ClassPathResource("static/make-images/"+marque.replace('_', '-').replace(' ', '-')+".png");
 
         if (!imgFile.exists()) {
