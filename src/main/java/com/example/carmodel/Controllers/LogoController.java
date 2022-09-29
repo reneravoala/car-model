@@ -1,4 +1,4 @@
-package com.example.carmodel;
+package com.example.carmodel.Controllers;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;

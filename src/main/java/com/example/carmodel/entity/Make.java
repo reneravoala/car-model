@@ -25,6 +25,13 @@ public class Make {
     @Column(name = "updated_at")
     private Date updatedAt;
 
+    protected Make() {}
+
+    public Make(String name, String logo) {
+        this.name = name;
+        this.logo = logo;
+    }
+
     @OneToMany(mappedBy = "make", cascade = CascadeType.ALL)
     private List<Model> models = new ArrayList<>();
 
