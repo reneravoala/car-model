@@ -29,6 +29,14 @@ public class Make {
 
     @JsonIgnore
     @OneToMany(mappedBy = "make", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    protected Make() {}
+
+    public Make(String name, String logo) {
+        this.name = name;
+        this.logo = logo;
+    }
+
+    @OneToMany(mappedBy = "make", cascade = CascadeType.ALL)
     private List<Model> models = new ArrayList<>();
 
     public Long getId() {
