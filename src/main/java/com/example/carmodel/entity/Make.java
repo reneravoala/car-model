@@ -27,8 +27,6 @@ public class Make {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "make", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     protected Make() {}
 
     public Make(String name, String logo) {
@@ -36,7 +34,8 @@ public class Make {
         this.logo = logo;
     }
 
-    @OneToMany(mappedBy = "make", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "make", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Model> models = new ArrayList<>();
 
     public Long getId() {
