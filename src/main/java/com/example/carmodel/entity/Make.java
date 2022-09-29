@@ -3,8 +3,11 @@ package com.example.carmodel.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.persistence.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,9 +22,6 @@ public class Make {
     @Column(name = "name", length = 50, nullable = false, unique = true)
     private String name;
 
-    @Column(name = "logo", length = 50, nullable = false)
-    private String logo;
-
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
@@ -30,6 +30,7 @@ public class Make {
     @JsonIgnore
     @OneToMany(mappedBy = "make", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Model> models = new ArrayList<>();
+
 
     public Long getId() {
         return id;
@@ -41,14 +42,6 @@ public class Make {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
     }
 
     public Date getUpdatedAt() {
@@ -67,6 +60,18 @@ public class Make {
     public long countModels() {
         return models.size();
     }
+    @JsonSerialize
+    private String LogoUrl() {
+        return "http://127.0.0.1:8080/logo/"+getName().replace(" ", "_").toLowerCase();
+    }
 
-
+    //ito ts mety itany vue que misy le parametre request
+    @JsonSerialize
+    private String baseUrl(HttpServletRequest request) throws IOException {
+        String uri = ServletUriComponentsBuilder.fromRequestUri(request)
+                .replacePath(null)
+                .build()
+                .toUriString();
+        return uri;
+    }
 }
