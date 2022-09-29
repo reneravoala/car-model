@@ -1,5 +1,7 @@
 package com.example.carmodel.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -14,7 +16,7 @@ public class Make {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", length = 50, nullable = false)
+    @Column(name = "name", length = 50, nullable = false, unique = true)
     private String name;
 
     @Column(name = "logo", length = 50, nullable = false)
@@ -25,14 +27,8 @@ public class Make {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    protected Make() {}
-
-    public Make(String name, String logo) {
-        this.name = name;
-        this.logo = logo;
-    }
-
-    @OneToMany(mappedBy = "make", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "make", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Model> models = new ArrayList<>();
 
     public Long getId() {
@@ -65,6 +61,11 @@ public class Make {
 
     public void setModels(List<Model> models) {
         this.models = models;
+    }
+
+    @JsonSerialize
+    public long countModels() {
+        return models.size();
     }
 
 
