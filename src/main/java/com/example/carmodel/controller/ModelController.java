@@ -17,48 +17,99 @@ import java.util.Optional;
 @RestController
 public class ModelController {
 
-
     @Autowired
     private MakeRepository makeRepository;
     @Autowired
     private ModelRepository modelRepository;
 
     @GetMapping("/models/make-name/{name}")
-    public List<Model> findByName(@PathVariable String name) throws MakeNotFoundException {
-        Make make = makeRepository.findByName(name);
-        if (make != null) {
-            return make.getModels();
+    public ResponseEntity<?> findByMakeName(@PathVariable String name) throws MakeNotFoundException {
+        Make make = makeRepository.findByNameIgnoreCase(name);
+        if (make == null) {
+            return ResponseEntity.notFound().build();
         }
-        return null;
+        return new ResponseEntity<>(make.getModels(), HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/models/make-id/{id}")
-    public List<Model> findByName(@PathVariable long id) throws MakeNotFoundException {
+    public ResponseEntity<?> findByMakeId(@PathVariable long id) throws MakeNotFoundException {
         Make make = makeRepository.findById(id);
-        if (make != null) {
-            return make.getModels();
+        if (make == null) {
+            return ResponseEntity.notFound().build();
         }
-        return null;
+        return new ResponseEntity<>(make.getModels(), HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/model/{makeId}/")
-    public ResponseEntity<?> create(@PathVariable long makeId, @Valid @RequestBody Model model) throws MakeNotFoundException {
+    @GetMapping("/models/id/{id}")
+    public ResponseEntity<?> findById(@PathVariable long id) throws MakeNotFoundException {
+        Model model = modelRepository.findOneById(id);
+        if (model == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return new ResponseEntity<>(model, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/models")
+    public ResponseEntity<?> findBy(@RequestParam("name") Optional<String> name,
+                                    @RequestParam("year") Optional<Integer> year,
+                                    @RequestParam("category") Optional<String> category) throws MakeNotFoundException {
+        String n = name.orElse("");
+        Integer y = year.orElse(0);
+        String c = category.orElse("");
+        List<Model> models;
+        if (y != 0) {
+            models = modelRepository.findByNameAndCategoryAndYear(n, c, y);
+        } else {
+            models = modelRepository.findByNameAndCategory(n, c);
+        }
+        return new ResponseEntity<>(models, HttpStatus.ACCEPTED);
+    }
+
+//    @GetMapping("/models/year/{year}")
+//    public ResponseEntity<?> findByYear(@PathVariable long year) throws MakeNotFoundException {
+//        List<Model> models = modelRepository.findByYear(year);
+//        if (models == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return new ResponseEntity<>(models, HttpStatus.ACCEPTED);
+//    }
+//
+//    @GetMapping("/models/category/{category}")
+//    public ResponseEntity<?> findByCategory(@PathVariable String category) throws MakeNotFoundException {
+//        List<Model> models = modelRepository.findByCategory(category);
+//        if (models == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return new ResponseEntity<>(models, HttpStatus.ACCEPTED);
+//    }
+
+    @PostMapping("/models/create/{makeId}/")
+    public ResponseEntity<?> create(@Valid @PathVariable long makeId, @Valid @RequestBody Model model) throws MakeNotFoundException {
         model.setMake(makeRepository.findById(makeId));
-        return new ResponseEntity<>(modelRepository.saveAndFlush(model), HttpStatus.CREATED);
+        return new ResponseEntity<>(modelRepository.save(model), HttpStatus.CREATED);
     }
 
-    @PutMapping("/model/update/{id}")
-    public ResponseEntity<?> update(@RequestBody Model model, @PathVariable long id) {
-        Optional<Model> modelOptional = modelRepository.findById(id);
+    @PutMapping("/models/update")
+    public ResponseEntity<?> update(@RequestBody Model model) {
+        Model updated = modelRepository.findOneById(model.getId());
 
-        if (modelOptional.isEmpty())
+        if (updated == null)
             return ResponseEntity.notFound().build();
 
-        model.setId(id);
-        model.setMake(modelOptional.get().getMake());
+        updated.update(model);
 
-        modelRepository.save(model);
+        return new ResponseEntity<>(modelRepository.save(updated), HttpStatus.ACCEPTED);
+    }
 
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/models/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable long id) {
+        Model model = modelRepository.findOneById(id);
+
+        if (model == null) {
+            return ResponseEntity.notFound().build();
+        }
+        modelRepository.delete(model);
+
+        return ResponseEntity.ok().build();
     }
 }

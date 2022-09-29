@@ -18,11 +18,4 @@ public class MakeController {
         return makeRepository.findAll();
     }
 
-    @PutMapping("/{id}")
-    public Make update(@PathVariable long id, @RequestBody Make make) {
-        Make edited = makeRepository.findById(id);
-        edited.setName(make.getName());
-        makeRepository.save(edited);
-        return edited;
-    }
 }

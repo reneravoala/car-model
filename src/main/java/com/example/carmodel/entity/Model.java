@@ -44,7 +44,6 @@ public class Model {
 
     @ManyToOne
     @JoinColumn(name ="make_id", nullable = false)
-    @JsonIgnore
     private Make make;
 
     public void setId(Long id) {
@@ -95,4 +94,15 @@ public class Model {
         return updatedAt;
     }
 
+    public void update(Model model) {
+        if(model.getCategory() != null) {
+            this.setCategory(model.getCategory());
+        }
+        if(model.getName() != null) {
+            this.setName(model.getName());
+        }
+        if(model.getYear() != 0) {
+            this.setYear(model.getYear());
+        }
+    }
 }

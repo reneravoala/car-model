@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface MakeRepository extends JpaRepository<Make, Long> {
-    Make findByName(String name);
+    Make findByNameIgnoreCase(String name);
 
     Make findById(long id);
 }
