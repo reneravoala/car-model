@@ -1,5 +1,8 @@
 package com.example.carmodel.entity;
 
+import com.example.carmodel.UrlUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -14,18 +17,16 @@ public class Make {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", length = 50, nullable = false)
+    @Column(name = "name", length = 50, nullable = false, unique = true)
     private String name;
-
-    @Column(name = "logo", length = 50, nullable = false)
-    private String logo;
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    @OneToMany(mappedBy = "make", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "make", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Model> models = new ArrayList<>();
 
     public Long getId() {
@@ -40,14 +41,6 @@ public class Make {
         this.name = name;
     }
 
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
-
     public Date getUpdatedAt() {
         return updatedAt;
     }
@@ -60,5 +53,16 @@ public class Make {
         this.models = models;
     }
 
+    @JsonSerialize
+    public long countModels() {
+        return models.size();
+    }
+
+    @JsonSerialize
+    public String logoUrl() {
+        return UrlUtil.baseUrl + "/logo/" + getName().
+                replace(" ", "_").
+                toLowerCase();
+    }
 
 }
