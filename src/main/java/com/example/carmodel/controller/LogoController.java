@@ -1,5 +1,6 @@
 package com.example.carmodel.controller;
 
+import com.example.carmodel.UrlUtil;
 import com.example.carmodel.entity.Make;
 import com.example.carmodel.repository.MakeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class LogoController {
             String resource;
 
             while ((resource = br.readLine()) != null) {
-                filenames.add(resource);
+                filenames.add(UrlUtil.baseUrl + "/logo/" + resource.substring(0,resource.length()-4));
             }
         }
         return filenames;
